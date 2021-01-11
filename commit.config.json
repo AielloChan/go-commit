@@ -1,0 +1,95 @@
+{
+  "preview": true,
+  "stages": [
+    {
+      "label": "请选择改动的类型(就是改动了什么):",
+      "name": "type",
+      "type": "multi-select",
+      "config": {
+        "max": 4,
+        "options": [
+          {
+            "label": "#!echo `uname`'\t你好鸭zbc'",
+            "value": "feat"
+          },
+          {
+            "label": "Fix\t修复一个 bug",
+            "value": "fix"
+          },
+          {
+            "label": "Docs\t文档更新",
+            "value": "doc"
+          }
+        ],
+        "next": "scope"
+      }
+    },
+    {
+      "label": "改动的范围",
+      "name": "scope",
+      "type": "select",
+      "config": {
+        "max": 4,
+        "options": [
+          {
+            "label": "首页\t\t首页以及该页面的更改",
+            "value": "首页"
+          },
+          {
+            "label": "人才主页\t人才主页相关的更改",
+            "value": "人才主页"
+          },
+          {
+            "label": "下载页面\t文档更新",
+            "value": "下载页面"
+          },
+          {
+            "label": "自定义\t手动编写 scope",
+            "next": "customScope"
+          }
+        ]
+      },
+      "next": "title"
+    },
+    {
+      "label": "请输入自定义的 scope",
+      "name": "customScope",
+      "type": "string",
+      "config": {
+        "min": 0,
+        "max": 50
+      },
+      "next": "title"
+    },
+    {
+      "label": "请输入标题",
+      "name": "title",
+      "type": "string",
+      "config": {
+        "min": 1,
+        "max": 70
+      },
+      "next": "\""
+    },
+    {
+      "label": "请输入更详细的描述",
+      "name": "body",
+      "type": "multiline",
+      "config": {
+        "min": 0,
+        "max": 120
+      },
+      "next": "breaking"
+    },
+    {
+      "label": "是否为破坏性修改",
+      "name": "breaking",
+      "type": "confirm",
+      "config": {
+        "default": false
+      }
+    }
+  ],
+  "format": "#${{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}",
+  "success": "#!echo '完成后的回调'"
+}
