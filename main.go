@@ -162,8 +162,8 @@ func main() {
 		survey.AskOne(prompt, &confirmed)
 	}
 	if confirmed {
-		fmt.Println("Success")
+		tools.GetString(cfg.Success, store)
 	} else {
-		fmt.Println("Cancel")
+		tools.GetString(cfg.Cancel, store)
 	}
 }

@@ -29,6 +29,8 @@ type Configuration struct {
 	Preview bool    `json:"preview"`
 	Stages  []Stage `json:"stages"`
 	Format  string  `json:"format"`
+	Success string  `json:"success"`
+	Cancel  string  `json:"cancel"`
 }
 
 func GetConfig(cfgPath string) (Configuration, error) {

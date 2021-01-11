@@ -91,5 +91,6 @@
     }
   ],
   "format": "#${{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}",
-  "success": "#!echo '完成后的回调'"
+  "success": "#!echo '完成后的回调'",
+  "cancel": "#!echo '取消后的回调'"
 }
