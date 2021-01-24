@@ -8,33 +8,36 @@
 
 - 无任何依赖包：二进制分发，下载后直接运行
 - 原生跨平台：基于 Golang 的跨平台特性，能在 Window、macOS、Linux，不同 CPU 架构使用
-- 流程化的配置：按步骤配置，可实现根据上一步的结果跳转到指定下一步骤。可适配多种使用场景
+- 全流程化的配置：按步骤配置，可实现根据上一步的结果跳转到指定下一步骤。可适配多种使用场景
 - 强大的数据模板：所有的提示文本、选择文本、输出文本，都可以使用模板语法，使用 shell 的输出
 
 ## 配置文件示例
 
 ```json
 {
-  "preview": true,
   "stages": [
     {
-      "label": "请选择改动的类型(就是改动了什么):",
+      "label": "请选择改动的类型: ",
       "name": "type",
-      "type": "multi-select",
+      "type": "select",
       "config": {
-        "max": 4,
+        "size": 4,
         "options": [
           {
-            "label": "#!echo `uname`'\t新的功能'",
+            "label": "Feat\tA new feature",
             "value": "feat"
           },
           {
-            "label": "Fix\t修复一个 bug",
+            "label": "Fix\tA bug fix",
             "value": "fix"
           },
           {
-            "label": "Docs\t文档更新",
-            "value": "doc"
+            "label": "Perf\tA code change that improves performance",
+            "value": "perf"
+          },
+          {
+            "label": "Test\tAdding missing tests or correcting existing tests",
+            "value": "test"
           }
         ],
         "next": "scope"
@@ -45,7 +48,7 @@
       "name": "scope",
       "type": "select",
       "config": {
-        "max": 4,
+        "size": 4,
         "options": [
           {
             "label": "首页\t\t首页以及该页面的更改",
@@ -103,21 +106,41 @@
       "config": {
         "default": false
       }
+    },
+    {
+      "name": "checkStash",
+      "type": "command",
+      "config": {
+        "cmd": "#![ `git diff --cached --name-only | wc -l` != 0 ]",
+        "success": "submit",
+        "failed": "noFile"
+      }
+    },
+    {
+      "label": "#!echo 加入的文件数量为 `git diff --cached --name-only | wc -l` 是否继续提交？",
+      "name": "noFile",
+      "type": "confirm",
+      "next": "checkStash"
+    },
+    {
+      "name": "submit",
+      "type": "command",
+      "config": {
+        "cmd": "#$!git commit -m '{{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}'"
+      }
     }
-  ],
-  "format": "#${{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}",
-  "success": "#!echo '完成后的回调'",
-  "cancel": "#!echo '取消后的回调'",
+  ]
 }
 ```
 
 ### 支持的步骤类型：
 
-- select：单选
-- multi-select：多选
-- string：文本输入
-- multiline：多行文本
-- confirm：是或否选择
+- select: 单选
+- multi-select: 多选
+- string: 文本输入
+- multiline: 多行文本
+- confirm: 是或否选择
+- command: 执行命令
 
 ### 模板工具
 
@@ -130,14 +153,6 @@
 
 所有的选项和步骤后，都可以定义 `next` 字段，它表示下一步该跳到哪个步骤执行，如 `改动的范围` 步骤中的最后一个选项，如果选择`自定义`那一项，则会直接跳转到 `请输入自定义的 scope` 这一步骤，实现流程可完全自定义化
 
-最后，支持
-
-- format
-- success
-- cancel
-
-等三个小工具，不论你想要什么样的格式，都可以通过模板函数和 shell 回调来解决
-
 ## 测试使用
 
 - 安装 golang 环境（自行 Google😂）
@@ -148,8 +163,8 @@
 
 ## ToDo
 
-- [ ] 整理代码结构
-- [ ] 完善错误处理
+- [x] 整理代码结构
+- [x] 完善错误处理
 - [ ] 增加测试
 - [ ] 发布二进制包到包管理器（homebrew、yum、apt、WinGet）
 - [ ] pull request [survey](https://github.com/AlecAivazis/survey) 的源码，使其多行编辑更友好
