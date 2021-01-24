@@ -16,5 +16,5 @@ func (store *Store) GetValue(key string) string {
 	if value, ok := (*store)[key]; ok {
 		return value
 	}
-	panic("Can't access key '" + key + "' in store")
+	return ""
 }

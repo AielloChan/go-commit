@@ -1,4 +1,4 @@
-package configs
+package config
 
 import (
 	"encoding/json"
@@ -14,9 +14,13 @@ type SelectOptions struct {
 type StageConfig struct {
 	Min     int             `json:"min"`
 	Max     int             `json:"max"`
+	Size    int             `json:"size"`
 	Options []SelectOptions `json:"options"`
 	Default interface{}     `json:"default"`
 	Next    string          `json:"next"`
+	Cmd     string          `json:"cmd"`
+	Success string          `json:"success"`
+	Failed  string          `json:"failed"`
 }
 type Stage struct {
 	Label  string      `json:"label"`
@@ -26,11 +30,7 @@ type Stage struct {
 	Next   string      `json:"next"`
 }
 type Configuration struct {
-	Preview bool    `json:"preview"`
-	Stages  []Stage `json:"stages"`
-	Format  string  `json:"format"`
-	Success string  `json:"success"`
-	Cancel  string  `json:"cancel"`
+	Stages []Stage `json:"stages"`
 }
 
 func GetConfig(cfgPath string) (Configuration, error) {

@@ -34,5 +34,12 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println(string(ip))
-	fmt.Println(strings.Trim(string(ip), "\n"))
+
+	cmd = exec.Command("/bin/sh", "-c", "[ `git diff --cached --name-only | wc -l` != 0 ] && echo 'ok' || echo 'not ok' && exit ")
+	if res, err := cmd.Output(); err != nil {
+		fmt.Println(err)
+		// os.Exit(1)
+	} else {
+		fmt.Println(res)
+	}
 }

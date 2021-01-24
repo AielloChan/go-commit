@@ -1,24 +1,55 @@
 {
-  "preview": true,
   "stages": [
     {
-      "label": "请选择改动的类型(就是改动了什么):",
+      "label": "请选择改动的类型: ",
       "name": "type",
-      "type": "multi-select",
+      "type": "select",
       "config": {
-        "max": 4,
+        "size": 4,
         "options": [
           {
-            "label": "#!echo `uname`'\t你好鸭zbc'",
+            "label": "Feat\tA new feature",
             "value": "feat"
           },
           {
-            "label": "Fix\t修复一个 bug",
+            "label": "Fix\tA bug fix",
             "value": "fix"
           },
           {
-            "label": "Docs\t文档更新",
-            "value": "doc"
+            "label": "Docs\tDocumentation only changes",
+            "value": "docs"
+          },
+          {
+            "label": "Style\tChanges that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)",
+            "value": "style"
+          },
+          {
+            "label": "Refactor\tA code change that neither fixes a bug nor adds a feature",
+            "value": "refactor"
+          },
+          {
+            "label": "Perf\tA code change that improves performance",
+            "value": "perf"
+          },
+          {
+            "label": "Test\tAdding missing tests or correcting existing tests",
+            "value": "test"
+          },
+          {
+            "label": "Build\tChanges that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)",
+            "value": "build"
+          },
+          {
+            "label": "Ci\tChanges to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)",
+            "value": "ci"
+          },
+          {
+            "label": "Chore\tOther changes that don't modify src or test files",
+            "value": "chore"
+          },
+          {
+            "label": "Revert\tReverts a previous commit",
+            "value": "revert"
           }
         ],
         "next": "scope"
@@ -29,7 +60,7 @@
       "name": "scope",
       "type": "select",
       "config": {
-        "max": 4,
+        "size": 4,
         "options": [
           {
             "label": "首页\t\t首页以及该页面的更改",
@@ -87,9 +118,28 @@
       "config": {
         "default": false
       }
+    },
+    {
+      "name": "checkStash",
+      "type": "command",
+      "config": {
+        "cmd": "#![ `git diff --cached --name-only | wc -l` != 0 ]",
+        "success": "submit",
+        "failed": "noFile"
+      }
+    },
+    {
+      "label": "#!echo 加入的文件数量为 `git diff --cached --name-only | wc -l` 是否继续提交？",
+      "name": "noFile",
+      "type": "confirm",
+      "next": "checkStash"
+    },
+    {
+      "name": "submit",
+      "type": "command",
+      "config": {
+        "cmd": "#$!git commit -m '{{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}'"
+      }
     }
-  ],
-  "format": "#${{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}",
-  "success": "#!echo '完成后的回调'",
-  "cancel": "#!echo '取消后的回调'"
+  ]
 }
