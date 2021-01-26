@@ -51,45 +51,6 @@ func GoOriginalNext(next string, stages *[]config.Stage, index int, store *model
 	return nil
 }
 
-// ProcessMultiSelect multi select handler
-func ProcessMultiSelect(stages *[]config.Stage, index int, store *model.Store) error {
-	curStage := (*stages)[index]
-	selectedLabels := []string{}
-	options := make(StringList, len(curStage.Config.Options))
-	for i := 0; i < len(curStage.Config.Options); i++ {
-		res, err := tools.ExecCommand(curStage.Config.Options[i].Label, store)
-		if err != nil {
-			return err
-		}
-		options[i] = res
-	}
-	res, err := tools.ExecCommand(curStage.Label, store)
-	if err != nil {
-		return err
-	}
-	prompt := &survey.MultiSelect{
-		Message:  res,
-		Options:  options,
-		PageSize: curStage.Config.Size,
-	}
-	err = survey.AskOne(prompt, &selectedLabels)
-	if err != nil {
-		return err
-	}
-	// set values to store
-	if len(selectedLabels) > 0 {
-		selectedValues := []string{}
-		for _, selectedLabel := range selectedLabels {
-			selectedOption := curStage.Config.Options[options.FindIndex(selectedLabel)]
-			selectedValues = append(selectedValues, selectedOption.Value)
-		}
-		(*store)[curStage.Name] = strings.Join(selectedValues[:], ",")
-	} else {
-		// FIXME: has not choose
-	}
-	return GoOriginalNext("", stages, index, store)
-}
-
 // ProcessString string input handler
 func ProcessString(stages *[]config.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
@@ -151,6 +112,79 @@ func ProcessMultiLine(stages *[]config.Stage, index int, store *model.Store) err
 	return GoOriginalNext("", stages, index, store)
 }
 
+// ProcessSelect select hander
+func ProcessSelect(stages *[]config.Stage, index int, store *model.Store) error {
+	curStage := (*stages)[index]
+	selectedLabel := ""
+	options := make(StringList, len(curStage.Config.Options))
+	for i := 0; i < len(curStage.Config.Options); i++ {
+		res, err := tools.ExecCommand(curStage.Config.Options[i].Label, store)
+		if err != nil {
+			return err
+		}
+		options[i] = res
+	}
+	res, err := tools.ExecCommand(curStage.Label, store)
+	if err != nil {
+		return err
+	}
+
+	prompt := &survey.Select{
+		Message:  res,
+		Options:  options,
+		PageSize: curStage.Config.Size,
+	}
+	err = survey.AskOne(prompt, &selectedLabel)
+	if err != nil {
+		return err
+	}
+	selectOption := curStage.Config.Options[options.FindIndex(selectedLabel)]
+	(*store)[curStage.Name] = selectOption.Value
+	if selectOption.Next == END_ROUTE {
+		return nil
+	}
+	return GoOriginalNext(selectOption.Next, stages, index, store)
+}
+
+// ProcessMultiSelect multi select handler
+func ProcessMultiSelect(stages *[]config.Stage, index int, store *model.Store) error {
+	curStage := (*stages)[index]
+	selectedLabels := []string{}
+	options := make(StringList, len(curStage.Config.Options))
+	for i := 0; i < len(curStage.Config.Options); i++ {
+		res, err := tools.ExecCommand(curStage.Config.Options[i].Label, store)
+		if err != nil {
+			return err
+		}
+		options[i] = res
+	}
+	res, err := tools.ExecCommand(curStage.Label, store)
+	if err != nil {
+		return err
+	}
+	prompt := &survey.MultiSelect{
+		Message:  res,
+		Options:  options,
+		PageSize: curStage.Config.Size,
+	}
+	err = survey.AskOne(prompt, &selectedLabels)
+	if err != nil {
+		return err
+	}
+	// set values to store
+	if len(selectedLabels) > 0 {
+		selectedValues := []string{}
+		for _, selectedLabel := range selectedLabels {
+			selectedOption := curStage.Config.Options[options.FindIndex(selectedLabel)]
+			selectedValues = append(selectedValues, selectedOption.Value)
+		}
+		(*store)[curStage.Name] = strings.Join(selectedValues[:], ",")
+	} else {
+		// FIXME: has not choose
+	}
+	return GoOriginalNext("", stages, index, store)
+}
+
 // ProcessConfirm confirm question handler
 func ProcessConfirm(stages *[]config.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
@@ -191,52 +225,18 @@ func ProcessCommand(stages *[]config.Stage, index int, store *model.Store) error
 	return GoOriginalNext(next, stages, index, store)
 }
 
-// ProcessSelect select hander
-func ProcessSelect(stages *[]config.Stage, index int, store *model.Store) error {
-	curStage := (*stages)[index]
-	selectedLabel := ""
-	options := make(StringList, len(curStage.Config.Options))
-	for i := 0; i < len(curStage.Config.Options); i++ {
-		res, err := tools.ExecCommand(curStage.Config.Options[i].Label, store)
-		if err != nil {
-			return err
-		}
-		options[i] = res
-	}
-	res, err := tools.ExecCommand(curStage.Label, store)
-	if err != nil {
-		return err
-	}
-
-	prompt := &survey.Select{
-		Message:  res,
-		Options:  options,
-		PageSize: curStage.Config.Size,
-	}
-	err = survey.AskOne(prompt, &selectedLabel)
-	if err != nil {
-		return err
-	}
-	selectOption := curStage.Config.Options[options.FindIndex(selectedLabel)]
-	(*store)[curStage.Name] = selectOption.Value
-	if selectOption.Next == END_ROUTE {
-		return nil
-	}
-	return GoOriginalNext(selectOption.Next, stages, index, store)
-}
-
 // RunJob run every stage jobs
 func RunJob(stages *[]config.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	switch curStage.Type {
-	case "select":
-		return ProcessSelect(stages, index, store)
-	case "multi-select":
-		return ProcessMultiSelect(stages, index, store)
 	case "string":
 		return ProcessString(stages, index, store)
 	case "multiline":
 		return ProcessMultiLine(stages, index, store)
+	case "select":
+		return ProcessSelect(stages, index, store)
+	case "multi-select":
+		return ProcessMultiSelect(stages, index, store)
 	case "confirm":
 		return ProcessConfirm(stages, index, store)
 	case "command":
