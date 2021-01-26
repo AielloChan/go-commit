@@ -120,6 +120,11 @@
       }
     },
     {
+      "label": "#$内容预览:\n#-----------------------------#\n{{.type}}({{.scope}}{{.customScope}}): {{.title}}\n\n{{.body}}\n#-----------------------------#",
+      "name": "preview",
+      "type": "command"
+    },
+    {
       "name": "checkStash",
       "type": "command",
       "config": {

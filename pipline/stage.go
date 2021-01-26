@@ -3,10 +3,12 @@ package pipline
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/fatih/color"
 	"yuanling.com/go-commit/config"
 	"yuanling.com/go-commit/model"
 	"yuanling.com/go-commit/tools"
@@ -213,12 +215,23 @@ func ProcessConfirm(stages *[]config.Stage, index int, store *model.Store) error
 // just for route command by excute result
 func ProcessCommand(stages *[]config.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
-	_, err := tools.ExecCommand(curStage.Config.Cmd, store)
+	if curStage.Label != "" {
+		// Print label
+		res, err := tools.ExecCommand(curStage.Label, store)
+		if err != nil {
+			return err
+		}
+		color.New(color.FgGreen, color.Bold).Fprintf(os.Stdout, "? ")
+		color.New(color.Bold).Fprintf(os.Stdout, res+"\n")
+	}
+	res, err := tools.ExecCommand(curStage.Config.Cmd, store)
 	var next string
 	if err != nil {
 		// Goto failed route
 		next = curStage.Config.Failed
 	} else {
+		// Print result
+		fmt.Print(res)
 		// Goto success route
 		next = curStage.Config.Success
 	}
