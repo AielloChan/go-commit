@@ -9,7 +9,7 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
-	"yuanling.com/go-commit/config"
+	"yuanling.com/go-commit/configuration"
 	"yuanling.com/go-commit/model"
 	"yuanling.com/go-commit/tools"
 )
@@ -30,19 +30,19 @@ func (sa *StringList) FindIndex(s string) int {
 }
 
 // GoOriginalNext Goto next stage
-func GoOriginalNext(next string, stages *[]config.Stage, index int, store *model.Store) error {
+func GoOriginalNext(next string, stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	if next == END_ROUTE {
 		return nil
 	}
-	if idx, ok := config.FindStageIndexByName(stages, next); ok {
+	if idx, ok := configuration.FindStageIndexByName(stages, next); ok {
 		// process configured next stage
 		return RunJob(stages, idx, store)
 	}
 	if curStage.Next == END_ROUTE {
 		return nil
 	}
-	if idx, ok := config.FindStageIndexByName(stages, curStage.Next); ok {
+	if idx, ok := configuration.FindStageIndexByName(stages, curStage.Next); ok {
 		// process configured next stage
 		return RunJob(stages, idx, store)
 	}
@@ -54,7 +54,7 @@ func GoOriginalNext(next string, stages *[]config.Stage, index int, store *model
 }
 
 // ProcessString string input handler
-func ProcessString(stages *[]config.Stage, index int, store *model.Store) error {
+func ProcessString(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	value := ""
 	if curStage.Config.Default != nil {
@@ -84,7 +84,7 @@ func ProcessString(stages *[]config.Stage, index int, store *model.Store) error 
 }
 
 // ProcessMultiLine multiLine input handler
-func ProcessMultiLine(stages *[]config.Stage, index int, store *model.Store) error {
+func ProcessMultiLine(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 
 	value := ""
@@ -115,7 +115,7 @@ func ProcessMultiLine(stages *[]config.Stage, index int, store *model.Store) err
 }
 
 // ProcessSelect select hander
-func ProcessSelect(stages *[]config.Stage, index int, store *model.Store) error {
+func ProcessSelect(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	selectedLabel := ""
 	options := make(StringList, len(curStage.Config.Options))
@@ -149,7 +149,7 @@ func ProcessSelect(stages *[]config.Stage, index int, store *model.Store) error 
 }
 
 // ProcessMultiSelect multi select handler
-func ProcessMultiSelect(stages *[]config.Stage, index int, store *model.Store) error {
+func ProcessMultiSelect(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	selectedLabels := []string{}
 	options := make(StringList, len(curStage.Config.Options))
@@ -188,7 +188,7 @@ func ProcessMultiSelect(stages *[]config.Stage, index int, store *model.Store) e
 }
 
 // ProcessConfirm confirm question handler
-func ProcessConfirm(stages *[]config.Stage, index int, store *model.Store) error {
+func ProcessConfirm(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	answer := false
 	res, err := tools.ExecCommand(curStage.Label, store)
@@ -213,7 +213,7 @@ func ProcessConfirm(stages *[]config.Stage, index int, store *model.Store) error
 
 // ProcessCommand command handler
 // just for route command by excute result
-func ProcessCommand(stages *[]config.Stage, index int, store *model.Store) error {
+func ProcessCommand(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	if curStage.Label != "" {
 		// Print label
@@ -239,7 +239,7 @@ func ProcessCommand(stages *[]config.Stage, index int, store *model.Store) error
 }
 
 // RunJob run every stage jobs
-func RunJob(stages *[]config.Stage, index int, store *model.Store) error {
+func RunJob(stages *[]configuration.Stage, index int, store *model.Store) error {
 	curStage := (*stages)[index]
 	switch curStage.Type {
 	case "string":
