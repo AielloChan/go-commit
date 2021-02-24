@@ -3,7 +3,7 @@ module yuanling.com/go-commit
 go 1.15
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.2.7
+	github.com/AlecAivazis/survey/v2 v2.2.8
 	github.com/fatih/color v1.10.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/nsf/termbox-go v0.0.0-20201124104050-ed494de23a00
