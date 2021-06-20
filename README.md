@@ -1,8 +1,9 @@
-# Go Commit
+<h1 align="center">Go Commit</h1>
+<p align="center"><image src="https://user-images.githubusercontent.com/84165977/122666478-044d8200-d1e0-11eb-982f-0f25aa9f59aa.png" width="512"/></p>
 
-## 介绍
+## Go Commit
 
-一个用 Golang 编写的命令行工具，支持流程化的配置，并且有强大的字符串模板功能。
+一个用 Golang 编写的命令行工具，类似 [commitizen](https://github.com/commitizen/cz-cli) ，但速度更快，支持流程化的配置，并且有强大的字符串模板功能。
 
 ## 特性
 
@@ -11,9 +12,17 @@
 - 全流程化的配置：按步骤配置，可实现根据上一步的结果跳转到指定下一步骤。可适配多种使用场景
 - 强大的数据模板：所有的提示文本、选择文本、输出文本，都可以使用模板语法，使用 shell 的输出
 
-## 配置文件示例
+## 使用方式
 
-```json
+1. 从 [releases](https://github.com/AielloChan/go-commit/releases) 下载最新的版本。**目前只有 macOS 系统的二进制文件**
+2. 将文件存放到用户执行目录下并重命名为 **gcm**，如 `mv go-commit /usr/local/bin/gcm`，并授予执行权限 `chmod +x /usr/local/bin/gcm`
+3. 在你要执行 `gcm` 的目录下新建文件 **commit.config.json**，然后写入如下示例配置内容，即可通过 `gcm` 命令使用: 
+
+### 配置文件示例
+<details>
+  <summary>配置文件示例</summary>
+  
+  ```json
 {
   "stages": [
     {
@@ -132,6 +141,8 @@
   ]
 }
 ```
+  
+</details>
 
 ### 支持的步骤类型：
 
@@ -153,7 +164,7 @@
 
 所有的选项和步骤后，都可以定义 `next` 字段，它表示下一步该跳到哪个步骤执行，如 `改动的范围` 步骤中的最后一个选项，如果选择`自定义`那一项，则会直接跳转到 `请输入自定义的 scope` 这一步骤，实现流程可完全自定义化
 
-## 测试使用
+## 开发
 
 - 安装 golang 环境（自行 Google😂）
 - clone 本项目到本地
